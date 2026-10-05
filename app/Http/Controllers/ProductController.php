@@ -159,7 +159,7 @@ class ProductController extends Controller
 
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = unique_slug(Product::class, $validated['name']);
 
 
         /*
@@ -302,24 +302,7 @@ class ProductController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    $baseSlug = Str::slug($validated['name']);
-
-    $slug = $baseSlug;
-
-    $counter = 1;
-
-    while (
-        Product::where('slug', $slug)
-            ->where('id', '!=', $product->id)
-            ->exists()
-    ) {
-
-        $slug = $baseSlug . '-' . $counter;
-
-        $counter++;
-    }
-
-    $validated['slug'] = $slug;
+    $validated['slug'] = unique_slug(Product::class, $validated['name'], $product->id);
 
 
     /*
@@ -420,7 +403,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
 
-        if ($product->logo) {
+        if ($product->image) {
 
             $image = public_path($product->image);
 

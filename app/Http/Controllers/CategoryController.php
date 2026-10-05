@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -54,7 +54,7 @@ class CategoryController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = unique_slug(Category::class, $validated['name']);
 
         Category::create($validated);
 
@@ -91,7 +91,7 @@ class CategoryController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = unique_slug(Category::class, $validated['name'], $category->id);
 
         $category->update($validated);
 
@@ -109,7 +109,19 @@ class CategoryController extends Controller
      */
     public function delete($id)
     {
-        Category::where('id', $id)->delete();
+        $category = Category::findOrFail($id);
+
+        if (Product::where('category_id', $category->id)->exists()) {
+
+            Session::flash(
+                'error',
+                get_phrase('This category has products. Remove or move them first.')
+            );
+
+            return redirect()->back();
+        }
+
+        $category->delete();
 
         Session::flash(
             'success',

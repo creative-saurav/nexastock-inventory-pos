@@ -52,7 +52,7 @@ class BrandController extends Controller
                 'status' => ['required', 'boolean'],
             ]);
 
-            $validated['slug'] = Str::slug($validated['name']);
+            $validated['slug'] = unique_slug(Brand::class, $validated['name']);
 
 
             /*
@@ -114,7 +114,7 @@ class BrandController extends Controller
             'status' => ['required', 'boolean'],
         ]);
 
-        $validated['slug'] = Str::slug($validated['name']);
+        $validated['slug'] = unique_slug(Brand::class, $validated['name'], $brand->id);
 
 
         /*

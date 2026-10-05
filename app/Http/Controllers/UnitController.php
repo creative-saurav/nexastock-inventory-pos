@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 
 class UnitController extends Controller
 {
@@ -46,8 +46,8 @@ class UnitController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'short_name' => ['nullable', 'string'],
+            'name' => ['required', 'string', 'max:255', 'unique:units,name'],
+            'short_name' => ['required', 'string', 'max:20'],
             'status' => ['required', 'boolean'],
         ]);
 
@@ -82,8 +82,8 @@ class UnitController extends Controller
         $unit = Unit::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'short_name' => ['nullable', 'string'],
+            'name' => ['required', 'string', 'max:255', 'unique:units,name,' . $unit->id],
+            'short_name' => ['required', 'string', 'max:20'],
             'status' => ['required', 'boolean'],
         ]);
 
@@ -104,7 +104,19 @@ class UnitController extends Controller
      */
     public function delete($id)
     {
-        Unit::where('id', $id)->delete();
+        $unit = Unit::findOrFail($id);
+
+        if (Product::where('unit_id', $unit->id)->exists()) {
+
+            Session::flash(
+                'error',
+                get_phrase('This unit is used by products. Remove or change them first.')
+            );
+
+            return redirect()->back();
+        }
+
+        $unit->delete();
 
         Session::flash(
             'success',

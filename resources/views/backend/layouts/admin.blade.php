@@ -103,7 +103,7 @@
 
                         <a
                             href="{{ route('products') }}"
-                            class="nav-link {{ request()->routeIs('admin.products') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('products*') ? 'active' : '' }}"
                         >
 
                             <span class="menu-icon">
@@ -121,7 +121,7 @@
 
                         <a
                             href="{{ route('categories') }}"
-                            class="nav-link {{ request()->routeIs('admin.categories') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('categories*') ? 'active' : '' }}"
                         >
 
                             <span class="menu-icon">
@@ -139,7 +139,7 @@
 
                          <a
                             href="{{ route('brands') }}"
-                            class="nav-link {{ request()->routeIs('admin.brands') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('brands*') ? 'active' : '' }}"
                         >
 
                             <span class="menu-icon">
@@ -155,7 +155,7 @@
 
                          <a
                             href="{{ route('units') }}"
-                            class="nav-link {{ request()->routeIs('admin.units') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('units*') ? 'active' : '' }}"
                         >
 
                             <span class="menu-icon">
@@ -171,7 +171,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('suppliers') }}"
+                            class="nav-link {{ request()->routeIs('suppliers*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-truck"></i>
@@ -253,7 +256,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('purchases') }}"
+                            class="nav-link {{ request()->routeIs('purchases*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-bag-plus"></i>

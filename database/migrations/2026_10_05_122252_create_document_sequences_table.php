@@ -11,8 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::create('document_sequences', function (Blueprint $table) {
+
+            $table->id();
+
+            // e.g. PUR-20261005
+            $table->string('key')->unique();
+
+            $table->unsignedBigInteger('last_number')->default(0);
+
+            $table->timestamps();
         });
     }
 
@@ -21,8 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('document_sequences');
     }
 };

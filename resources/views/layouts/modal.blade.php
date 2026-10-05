@@ -155,15 +155,25 @@
 
                     </button>
 
-                    <a href=""
-                       id="save-btn"
-                       class="btn btn-danger premium-delete-btn">
+                    <form action=""
+                          method="POST"
+                          id="delete-form"
+                          class="d-inline">
 
-                        <i class="bi bi-trash3 me-1"></i>
+                        @csrf
+                        @method('DELETE')
 
-                        {{ get_phrase('Delete') }}
+                        <button type="submit"
+                                id="save-btn"
+                                class="btn btn-danger premium-delete-btn">
 
-                    </a>
+                            <i class="bi bi-trash3 me-1"></i>
+
+                            {{ get_phrase('Delete') }}
+
+                        </button>
+
+                    </form>
 
                 </div>
 
@@ -281,6 +291,8 @@
 
                     $('#ajax-modal-body').html(data);
 
+                    $(document).trigger('modal:loaded', [$('#ajax-modal-body')]);
+
                 },
 
                 error: function() {
@@ -343,6 +355,8 @@
 
                     $('#edit-modal-dialog .modal-body').html(data);
 
+                    $(document).trigger('modal:loaded', [$('#edit-modal-dialog .modal-body')]);
+
                 },
 
                 error: function() {
@@ -366,13 +380,31 @@
 
     /*
     |--------------------------------------------------------------------------
+    | Clear AJAX Content On Close
+    |--------------------------------------------------------------------------
+    |
+    | Prevents stale forms (with duplicate IDs) from lingering in the DOM
+    | after a modal is closed.
+    |
+    */
+
+    $(document).on('hidden.bs.modal', '#ajax-modal, #edit-modal', function () {
+
+        $(this).find('.modal-body').empty();
+
+    });
+
+
+
+    /*
+    |--------------------------------------------------------------------------
     | Delete Modal
     |--------------------------------------------------------------------------
     */
 
     function delete_modal(url) {
 
-        $('#save-btn').attr('href', url);
+        $('#delete-form').attr('action', url);
 
         $('#delete-modal').modal('show');
 
