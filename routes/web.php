@@ -17,10 +17,13 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CustomerPanelController;
 use App\Http\Controllers\StaffPanelController;
+use App\Http\Controllers\FrontendController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Public website
+Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::get('/shop', [FrontendController::class, 'products'])->name('shop.products');
+Route::get('/shop/{slug}', [FrontendController::class, 'product'])->name('shop.products.show');
+Route::get('/contact', [FrontendController::class, 'contact'])->name('contact');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
