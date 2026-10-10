@@ -9,11 +9,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>
-        @yield('title', 'Dashboard') - NexaStock
+        @yield('title', 'Dashboard') - {{ setting('name') }}
     </title>
 
-    <link rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     {{-- Bootstrap CSS --}}
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -50,13 +48,17 @@
 
                 <a href="{{ route('dashboard') }}" class="brand-link">
 
-                    <div class="brand-icon">
-                        <i class="bi bi-box-seam"></i>
+                    <div class="brand-icon {{ setting('logo') ? 'has-logo' : '' }}">
+                        @if(setting('logo'))
+                            <img src="{{ asset(setting('logo')) }}" alt="{{ setting('name') }}">
+                        @else
+                            <i class="bi bi-box-seam"></i>
+                        @endif
                     </div>
 
                     <div class="brand-content">
-                        <span class="brand-name">NexaStock</span>
-                        <small>Inventory & POS</small>
+                        <span class="brand-name">{{ setting('name') }}</span>
+                        <small>{{ setting('tagline') }}</small>
                     </div>
 
                 </a>
@@ -78,7 +80,7 @@
 
                         <a
                             href="{{ route('dashboard') }}"
-                            class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                            class="nav-link {{ request()->routeIs('*.dashboard') ? 'active' : '' }}"
                         >
                             <span class="menu-icon">
                                 <i class="bi bi-grid-1x2-fill"></i>
@@ -91,6 +93,106 @@
 
                 </ul>
 
+
+                {{-- Staff Panel --}}
+                @if(auth()->user()->hasRole('staff'))
+
+                    <div class="menu-label mt-4">
+                        INVENTORY
+                    </div>
+
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item">
+
+                            <a
+                                href="{{ route('staff.stock') }}"
+                                class="nav-link {{ request()->routeIs('staff.stock') ? 'active' : '' }}"
+                            >
+
+                                <span class="menu-icon">
+                                    <i class="bi bi-boxes"></i>
+                                </span>
+
+                                <span>Stock List</span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li class="nav-item">
+
+                            <a
+                                href="{{ route('staff.purchases') }}"
+                                class="nav-link {{ request()->routeIs('staff.purchases*') ? 'active' : '' }}"
+                            >
+
+                                <span class="menu-icon">
+                                    <i class="bi bi-truck"></i>
+                                </span>
+
+                                <span>Incoming Stock</span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                @endif
+
+
+                {{-- Customer Panel --}}
+                @if(auth()->user()->hasRole('customer'))
+
+                    <div class="menu-label mt-4">
+                        MY ACCOUNT
+                    </div>
+
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item">
+
+                            <a
+                                href="{{ route('customer.purchases') }}"
+                                class="nav-link {{ request()->routeIs('customer.purchases*') ? 'active' : '' }}"
+                            >
+
+                                <span class="menu-icon">
+                                    <i class="bi bi-bag-check"></i>
+                                </span>
+
+                                <span>My Purchases</span>
+
+                            </a>
+
+                        </li>
+
+
+                        <li class="nav-item">
+
+                            <a
+                                href="{{ route('profile.edit') }}"
+                                class="nav-link {{ request()->routeIs('profile.*') ? 'active' : '' }}"
+                            >
+
+                                <span class="menu-icon">
+                                    <i class="bi bi-person-circle"></i>
+                                </span>
+
+                                <span>My Profile</span>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                @endif
+
+
+                @if(auth()->user()->hasRole('admin', 'manager'))
 
                 {{-- Inventory --}}
                 <div class="menu-label mt-4">
@@ -186,8 +288,13 @@
 
                     </li>
 
+
                 </ul>
 
+                @endif
+
+
+                @if(auth()->user()->hasRole('admin', 'manager', 'cashier'))
 
                 {{-- Sales --}}
                 <div class="menu-label mt-4">
@@ -198,7 +305,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('pos') }}"
+                            class="nav-link {{ request()->routeIs('pos*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-cart-check"></i>
@@ -217,7 +327,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('sales') }}"
+                            class="nav-link {{ request()->routeIs('sales*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-receipt"></i>
@@ -229,23 +342,12 @@
 
                     </li>
 
-
-                    <li class="nav-item">
-
-                        <a href="#" class="nav-link">
-
-                            <span class="menu-icon">
-                                <i class="bi bi-people"></i>
-                            </span>
-
-                            <span>Customers</span>
-
-                        </a>
-
-                    </li>
-
                 </ul>
 
+                @endif
+
+
+                @if(auth()->user()->hasRole('admin', 'manager'))
 
                 {{-- Purchase --}}
                 <div class="menu-label mt-4">
@@ -274,7 +376,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('expenses') }}"
+                            class="nav-link {{ request()->routeIs('expenses*', 'expense_categories*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-wallet2"></i>
@@ -288,6 +393,10 @@
 
                 </ul>
 
+                @endif
+
+
+                @if(auth()->user()->hasRole('admin', 'manager'))
 
                 {{-- Reports --}}
                 <div class="menu-label mt-4">
@@ -298,7 +407,10 @@
 
                     <li class="nav-item">
 
-                        <a href="#" class="nav-link">
+                        <a
+                            href="{{ route('reports') }}"
+                            class="nav-link {{ request()->routeIs('reports*') ? 'active' : '' }}"
+                        >
 
                             <span class="menu-icon">
                                 <i class="bi bi-bar-chart-line"></i>
@@ -312,9 +424,11 @@
 
                 </ul>
 
+                @endif
+
 
                 {{-- System --}}
-                @if(auth()->user()->role === 'admin')
+                @if(auth()->user()->hasRole('admin'))
 
                     <div class="menu-label mt-4">
                         SYSTEM
@@ -324,7 +438,10 @@
 
                         <li class="nav-item">
 
-                            <a href="#" class="nav-link">
+                            <a
+                            href="{{ route('users') }}"
+                            class="nav-link {{ request()->routeIs('users*') ? 'active' : '' }}"
+                        >
 
                                 <span class="menu-icon">
                                     <i class="bi bi-person-gear"></i>
@@ -339,7 +456,10 @@
 
                         <li class="nav-item">
 
-                            <a href="#" class="nav-link">
+                            <a
+                                href="{{ route('settings') }}"
+                                class="nav-link {{ request()->routeIs('settings*') ? 'active' : '' }}"
+                            >
 
                                 <span class="menu-icon">
                                     <i class="bi bi-gear"></i>
@@ -406,7 +526,7 @@
                         </h6>
 
                         <span>
-                            Manage your business efficiently
+                            {{ auth()->user()->hasRole('customer') ? 'Your purchases at ' . setting('name') : 'Manage your business efficiently' }}
                         </span>
 
                     </div>
@@ -455,7 +575,11 @@
                         >
 
                             <div class="user-avatar">
-                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                @if(auth()->user()->image)
+                                    <img src="{{ asset(auth()->user()->image) }}" alt="{{ auth()->user()->name }}">
+                                @else
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                @endif
                             </div>
 
                             <div class="user-info">
@@ -505,17 +629,21 @@
 
                             </li>
 
-                            <li>
+                            @if(auth()->user()->hasRole('admin'))
 
-                                <a
-                                    class="dropdown-item"
-                                    href="#"
-                                >
-                                    <i class="bi bi-gear"></i>
-                                    Settings
-                                </a>
+                                <li>
 
-                            </li>
+                                    <a
+                                        class="dropdown-item"
+                                        href="{{ route('settings') }}"
+                                    >
+                                        <i class="bi bi-gear"></i>
+                                        Settings
+                                    </a>
+
+                                </li>
+
+                            @endif
 
                             <li>
                                 <hr class="dropdown-divider">
@@ -567,7 +695,7 @@
             <footer class="backend-footer">
 
                 <div>
-                    © {{ date('Y') }} <strong>NexaStock</strong>. All rights reserved.
+                    © {{ date('Y') }} <strong>{{ setting('name') }}</strong>. All rights reserved.
                 </div>
 
                 <div>
@@ -589,17 +717,17 @@
 
 
     {{-- Bootstrap JS --}}
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-
     {{-- jQuery --}}
     <script
         src="https://code.jquery.com/jquery-3.7.1.min.js">
     </script>
 
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+
+    
 
     {{-- Backend JS --}}
     <script

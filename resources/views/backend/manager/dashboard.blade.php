@@ -1,13 +1,10 @@
 @extends('backend.layouts.admin')
 
+@section('title', 'Manager Dashboard')
+@section('page-title', 'Manager Dashboard')
+
 @section('content')
 
-<div class="container-fluid">
-    <h2 class="fw-bold">Manager Dashboard</h2>
-
-    <p class="text-muted">
-        Welcome, {{ auth()->user()->name }}.
-    </p>
-</div>
+@include('backend.dashboard._overview')
 
 @endsection

@@ -1628,4 +1628,76 @@ button {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
+
+        #sale-print-area,
+        #sale-print-area * {
+            visibility: visible;
+        }
+
+        #sale-print-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px;
+        }
+
+        #report-print-area,
+        #report-print-area * {
+            visibility: visible;
+        }
+
+        #report-print-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0;
+        }
+
+        #report-print-area .card {
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+            break-inside: avoid;
+        }
+
+        body,
+        .main-area,
+        .content-area,
+        #report-print-area {
+            background: #fff !important;
+        }
+
+        /* Keep summary cards side by side on paper */
+        #report-print-area .report-stats > [class*="col-"] {
+            flex: 1 0 0;
+            width: auto;
+            max-width: none;
+        }
     }
+
+
+/* =========================================================
+   LOGO & AVATAR IMAGES
+========================================================= */
+
+.brand-icon.has-logo {
+    background: #fff;
+    overflow: hidden;
+}
+
+.brand-icon img,
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.brand-icon.has-logo img {
+    object-fit: contain;
+}
+
+.user-avatar {
+    overflow: hidden;
+}

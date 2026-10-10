@@ -446,6 +446,7 @@
 
                     <label class="form-label fw-medium">
                         Current Stock
+                        <span class="text-danger">*</span>
                     </label>
 
                     <div class="input-group">
@@ -456,15 +457,21 @@
 
                         <input
                             type="number"
+                            name="stock"
                             class="form-control"
-                            value="{{ $product->stock }}"
-                            readonly
+                            value="{{ old('stock', (float) $product->stock) }}"
+                            min="0"
+                            step="0.01"
+                            required
                         >
 
                     </div>
 
+                    {{-- Stock when this form was opened; only the difference is applied on save --}}
+                    <input type="hidden" name="original_stock" value="{{ (float) $product->stock }}">
+
                     <small class="text-muted">
-                        Stock is managed through purchases, sales and adjustments.
+                        Increase or decrease to correct the stock (damaged, lost, recount).
                     </small>
 
                 </div>

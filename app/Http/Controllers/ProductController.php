@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 
@@ -276,6 +277,17 @@ class ProductController extends Controller
             'min:0',
         ],
 
+        'stock' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
+
+        'original_stock' => [
+            'required',
+            'numeric',
+        ],
+
         'description' => [
             'nullable',
             'string',
@@ -294,6 +306,32 @@ class ProductController extends Controller
         ],
 
     ]);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stock Change
+    |--------------------------------------------------------------------------
+    |
+    | Only the difference the user typed is applied, so sales made while the
+    | form was open are not overwritten.
+    |
+    */
+
+    $stockChange = round((float) $validated['stock'] - (float) $validated['original_stock'], 2);
+
+    unset($validated['stock'], $validated['original_stock']);
+
+    // Check before touching the image, so a rejected save doesn't delete the old photo
+    if ($stockChange != 0 && (float) $product->stock + $stockChange < 0) {
+
+        Session::flash(
+            'error',
+            'Stock changed while you were editing (current: ' . (float) $product->stock . '). Please reopen the product and try again.'
+        );
+
+        return redirect()->back();
+    }
 
 
     /*
@@ -377,11 +415,39 @@ class ProductController extends Controller
     | Update Product
     |--------------------------------------------------------------------------
     |
-    | SKU, Barcode and Stock are not updated here.
+    | SKU and Barcode are not updated here.
     |
     */
 
-    $product->update($validated);
+    try {
+
+        DB::transaction(function () use ($product, $validated, $stockChange) {
+
+            $product->update($validated);
+
+            if ($stockChange != 0) {
+
+                // Lock the row so a sale at the same moment can't race this change
+                $locked = Product::lockForUpdate()->findOrFail($product->id);
+
+                $newStock = round((float) $locked->stock + $stockChange, 2);
+
+                if ($newStock < 0) {
+                    throw new \RuntimeException(
+                        'Stock changed while you were editing (current: ' . (float) $locked->stock . '). Please reopen the product and try again.'
+                    );
+                }
+
+                $locked->update(['stock' => $newStock]);
+            }
+        });
+
+    } catch (\RuntimeException $e) {
+
+        Session::flash('error', $e->getMessage());
+
+        return redirect()->back();
+    }
 
 
     /*
